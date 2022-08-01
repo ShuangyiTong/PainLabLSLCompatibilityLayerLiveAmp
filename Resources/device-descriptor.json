@@ -1,0 +1,11 @@
+﻿{
+  "name": "LiveAmp LSL Compatible Universal",
+  "device_id": "U45usrXMcwvE1UUbObUJ",
+  "device_type": "LIVEAMP_LSL_COMP_UNIV",
+  "data_to_control": {},
+  "report_pack_order": {
+    "packed": 20,
+    "order": null
+  },
+  "control_pack_order": null
+}
