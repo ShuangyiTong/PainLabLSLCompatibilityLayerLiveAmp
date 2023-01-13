@@ -70,7 +70,7 @@ namespace PainLabDeviceLSLCompatialeLayer
         public int trigger_channel = 0;
         public long ApplyControlData(SerialPort sp)
         {
-            Byte[] data = { (Byte)0 };
+            Byte[] data = { (Byte)trigger_channel };
 
             sp.Write(data, 0, 1);
             Thread.Sleep(10);
