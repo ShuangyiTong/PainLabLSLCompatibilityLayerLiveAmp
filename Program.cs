@@ -174,6 +174,20 @@ namespace PainLabDeviceLSLCompatialeLayer
             string networkJsonString = File.ReadAllText(networkConfigPath);
             NetworkConfig netConf = JsonConvert.DeserializeObject<NetworkConfig>(networkJsonString);
 
+            if (args.Length > 0)
+            {
+
+                if (args[0] == "no_data")
+                {
+                    protocol.info = new StreamInfo("dummy", "eeg", channel_count: 0);
+                    protocol.Init(netConf, waitOnControl: true);
+                    protocol.setupTriggerSerialPort();
+                    Thread controlThread_NoData = new Thread(new ThreadStart(protocol.ControlApplicationThread));
+                    controlThread_NoData.Start();
+                    Console.ReadLine();
+                    return;
+                }
+            }
 
             // wait until an EEG stream shows up
             StreamInfo[] results = LSL.LSL.resolve_stream("type", "EEG");
