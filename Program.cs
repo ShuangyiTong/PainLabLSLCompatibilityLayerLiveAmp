@@ -77,10 +77,6 @@ namespace PainLabDeviceLSLCompatialeLayer
 
             DateTimeOffset now = DateTimeOffset.UtcNow;
 
-            data[0] = 0x01;
-            sp.Write(data, 0, 1);
-            Thread.Sleep(10);
-
             data[0] = 0x00; 
             sp.Write(data, 0, 1); 
             Thread.Sleep(10);
@@ -95,6 +91,7 @@ namespace PainLabDeviceLSLCompatialeLayer
         public StreamInfo info;
         SerialPort sp;
         long last_ts = -1;
+        public Semaphore triggerSem = new Semaphore(0, 1);
         protected override void RegisterWithDescriptor()
         {
             string descriptorString = File.ReadAllText(descriptorPath);
@@ -125,6 +122,7 @@ namespace PainLabDeviceLSLCompatialeLayer
                       (Encoding.UTF8.GetString(_controlBuffer, 0, (int)_numControlBytes));
 
             last_ts = controlFrame.ApplyControlData(sp);
+            triggerSem.Release();
         }
 
         public void ControlApplicationThread()
@@ -184,8 +182,13 @@ namespace PainLabDeviceLSLCompatialeLayer
                     protocol.setupTriggerSerialPort();
                     Thread controlThread_NoData = new Thread(new ThreadStart(protocol.ControlApplicationThread));
                     controlThread_NoData.Start();
-                    Console.ReadLine();
-                    return;
+                    float[][] dummyData = new float[1][];
+                    dummyData[0] = new float[0];
+                    while (true)
+                    {
+                        protocol.triggerSem.WaitOne();
+                        protocol.UpdateFrameData(protocol.PrepareDataFrameBytes(dummyData));
+                    }
                 }
             }
 
